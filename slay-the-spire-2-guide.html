@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slay the Spire 2 — Complete Strategy Guide</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: '#111827',
+            ash: '#1f2937',
+            ember: '#ef4444',
+            'ember-dim': '#b91c1c',
+            'ember-glow': '#fca5a5',
+            parchment: '#f9fafb',
+            muted: '#9ca3af',
+          },
+          fontFamily: {
+            display: ['"Cinzel Decorative"', 'Georgia', 'serif'],
+            body: ['"Inter"', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'ember': '0 0 24px 4px rgba(239,68,68,0.25)',
+            'card': '0 4px 32px 0 rgba(0,0,0,0.55)',
+          },
+          backgroundImage: {
+            'rune-grid': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ef4444' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { background-color: #111827; color: #f9fafb; }
+
+    /* Flickering ember pseudo-element on the hero title */
+    .ember-underline {
+      position: relative;
+      display: inline-block;
+    }
+    .ember-underline::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -6px;
+      width: 100%; height: 3px;
+      background: linear-gradient(90deg, #ef4444, #fca5a5, #ef4444);
+      border-radius: 2px;
+      animation: flicker 2.8s ease-in-out infinite alternate;
+    }
+    @keyframes flicker {
+      0%   { opacity: 1; box-shadow: 0 0 8px #ef4444; }
+      40%  { opacity: 0.7; box-shadow: 0 0 2px #ef4444; }
+      60%  { opacity: 1; box-shadow: 0 0 14px #fca5a5; }
+      100% { opacity: 0.85; box-shadow: 0 0 6px #ef4444; }
+    }
+
+    /* Card shine effect */
+    .card-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .card-shine::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 60%; height: 100%;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%);
+      transform: skewX(-20deg);
+      transition: left 0.5s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .card-shine:hover::before {
+      left: 130%;
+    }
+
+    /* Nav blur */
+    .nav-blur {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Mobile menu */
+    .mobile-menu {
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+    .mobile-menu.open {
+      max-height: 320px;
+      opacity: 1;
+    }
+
+    /* Hero parallax tint */
+    .hero-overlay {
+      background: linear-gradient(180deg,
+        rgba(17,24,39,0.55) 0%,
+        rgba(17,24,39,0.70) 50%,
+        rgba(17,24,39,0.97) 100%
+      );
+    }
+
+    /* Animated CTA button */
+    .btn-ember {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-ember::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.15) 60%, transparent 80%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .btn-ember:hover::after { transform: translateX(100%); }
+    .btn-ember:hover { transform: translateY(-2px); box-shadow: 0 0 28px 6px rgba(239,68,68,0.4); }
+    .btn-ember:active { transform: translateY(0); }
+
+    /* Section fade-in via scroll (CSS-only approximation with animation) */
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-in {
+        animation: fadeUp 0.7s ease both;
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(28px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .delay-1 { animation-delay: 0.1s; }
+      .delay-2 { animation-delay: 0.2s; }
+      .delay-3 { animation-delay: 0.3s; }
+      .delay-4 { animation-delay: 0.4s; }
+    }
+  </style>
+</head>
+
+<body class="dark font-body antialiased bg-ink text-parchment">
+
+  <!-- ════════════════ NAVIGATION ════════════════ -->
+  <header class="fixed top-0 inset-x-0 z-50 nav-blur bg-ink/80 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-3 group" aria-label="Home">
+          <div class="w-8 h-8 rounded-md bg-ember flex items-center justify-center shadow-ember transition-all duration-300 group-hover:scale-110">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+            </svg>
+          </div>
+          <span class="font-display text-sm font-bold tracking-widest text-parchment hidden sm:block">
+            SPIRE<span class="text-ember">GUIDE</span>
+          </span>
+        </a>
+
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+          <a href="#" class="px-4 py-2 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all duration-200">Home</a>
+          <a href="#cards" class="px-4 py-2 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all duration-200">Characters</a>
+          <a href="#cards" class="px-4 py-2 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all duration-200">Builds</a>
+          <a href="#cards" class="px-4 py-2 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all duration-200">Tier List</a>
+          <a href="#intro" class="px-4 py-2 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all duration-200">Guides</a>
+          <a href="#cards" class="ml-2 px-5 py-2 text-sm font-semibold bg-ember text-white rounded-lg hover:bg-ember-dim transition-all duration-200 btn-ember">
+            Start Playing
+          </a>
+        </nav>
+
+        <!-- Mobile hamburger -->
+        <button id="menuToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Toggle navigation"
+          class="md:hidden p-2 rounded-lg text-muted hover:text-parchment hover:bg-white/10 transition-colors"
+          onclick="const m=document.getElementById('mobileMenu'); const open=m.classList.toggle('open'); this.setAttribute('aria-expanded',open);">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobileMenu" class="mobile-menu md:hidden pb-4" role="navigation" aria-label="Mobile navigation">
+        <div class="flex flex-col gap-1 pt-2 border-t border-white/5">
+          <a href="#" class="px-4 py-2.5 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all">Home</a>
+          <a href="#cards" class="px-4 py-2.5 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all">Characters</a>
+          <a href="#cards" class="px-4 py-2.5 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all">Builds</a>
+          <a href="#cards" class="px-4 py-2.5 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all">Tier List</a>
+          <a href="#intro" class="px-4 py-2.5 text-sm font-medium text-muted hover:text-parchment hover:bg-white/5 rounded-lg transition-all">Guides</a>
+          <a href="#cards" class="mt-2 px-4 py-2.5 text-sm font-semibold bg-ember text-white rounded-lg hover:bg-ember-dim transition-all text-center">Start Playing</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ════════════════ HERO ════════════════ -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden" aria-labelledby="hero-title">
+
+      <!-- Background image -->
+      <div class="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1600&auto=format&fit=crop&q=80"
+          alt="Dark fantasy dungeon atmosphere"
+          class="w-full h-full object-cover object-center scale-105"
+          style="filter: saturate(0.7) brightness(0.55);"
+          loading="eager"
+        />
+        <div class="hero-overlay absolute inset-0"></div>
+        <!-- Rune grid texture overlay -->
+        <div class="absolute inset-0 bg-rune-grid opacity-60"></div>
+      </div>
+
+      <!-- Floating ember particles (CSS-only) -->
+      <div class="absolute inset-0 pointer-events-none overflow-hidden z-10" aria-hidden="true">
+        <div class="absolute bottom-1/4 left-1/4 w-1 h-1 rounded-full bg-ember opacity-70 animate-bounce" style="animation-duration:2.1s;animation-delay:0.3s;"></div>
+        <div class="absolute bottom-1/3 left-2/3 w-1.5 h-1.5 rounded-full bg-ember-glow opacity-50 animate-bounce" style="animation-duration:3.4s;animation-delay:0.8s;"></div>
+        <div class="absolute bottom-1/2 left-1/2 w-1 h-1 rounded-full bg-ember opacity-40 animate-bounce" style="animation-duration:2.8s;animation-delay:1.2s;"></div>
+      </div>
+
+      <!-- Hero content -->
+      <div class="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <p class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-ember mb-6 px-3 py-1.5 border border-ember/30 rounded-full bg-ember/10 fade-in">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-ember animate-pulse"></span>
+          Early Access Strategy Hub
+        </p>
+
+        <h1 id="hero-title" class="font-display text-4xl sm:text-6xl lg:text-7xl font-black leading-tight text-parchment mb-6 fade-in delay-1">
+          Slay the<br/>
+          <span class="ember-underline text-ember">Spire 2</span>
+        </h1>
+
+        <p class="max-w-xl mx-auto text-base sm:text-lg text-muted leading-relaxed mb-10 fade-in delay-2">
+          Master every card, crush every boss. In-depth builds, tier lists, and strategy guides for every character — updated for the latest patch.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in delay-3">
+          <a href="#cards" class="btn-ember inline-flex items-center justify-center gap-2 px-8 py-4 bg-ember text-white font-semibold rounded-xl text-sm tracking-wide shadow-ember focus:outline-none focus:ring-2 focus:ring-ember focus:ring-offset-2 focus:ring-offset-ink">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+            Explore Guides
+          </a>
+          <a href="#intro" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-parchment font-semibold rounded-xl text-sm tracking-wide hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/30">
+            About This Site
+          </a>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="mt-16 grid grid-cols-3 divide-x divide-white/10 border border-white/10 rounded-2xl bg-black/30 backdrop-blur-sm max-w-md mx-auto fade-in delay-4">
+          <div class="py-5 px-4 text-center">
+            <p class="font-display text-2xl font-bold text-ember">4</p>
+            <p class="text-xs text-muted mt-1 uppercase tracking-widest">Characters</p>
+          </div>
+          <div class="py-5 px-4 text-center">
+            <p class="font-display text-2xl font-bold text-ember">300+</p>
+            <p class="text-xs text-muted mt-1 uppercase tracking-widest">Cards</p>
+          </div>
+          <div class="py-5 px-4 text-center">
+            <p class="font-display text-2xl font-bold text-ember">A20</p>
+            <p class="text-xs text-muted mt-1 uppercase tracking-widest">Max Ascension</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll cue -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce" aria-hidden="true">
+        <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ════════════════ CARDS ════════════════ -->
+    <section id="cards" class="py-24 px-4 sm:px-6 lg:px-8 bg-ink bg-rune-grid" aria-labelledby="cards-title">
+      <div class="max-w-7xl mx-auto">
+
+        <div class="text-center mb-14">
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-ember mb-3">Everything You Need</p>
+          <h2 id="cards-title" class="font-display text-3xl sm:text-4xl font-bold text-parchment">Strategy Library</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- Card 1: Beginner Guide -->
+          <article class="card-shine group relative bg-ash rounded-2xl overflow-hidden border border-white/5 shadow-card hover:border-ember/40 hover:-translate-y-1.5 transition-all duration-300 focus-within:ring-2 focus-within:ring-ember">
+            <div class="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80"
+                alt="Beginner gaming controller and cards"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-ash via-ash/40 to-transparent"></div>
+              <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ember text-white text-xs font-semibold uppercase tracking-wide">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Start Here
+              </span>
+            </div>
+            <div class="p-5 relative z-10">
+              <h3 class="font-display text-base font-bold text-parchment mb-2 group-hover:text-ember-glow transition-colors">Beginner Guide</h3>
+              <p class="text-xs text-muted leading-relaxed mb-4">Core mechanics, energy system, how to draft a winning deck, and your first run tips — all in one place.</p>
+              <a href="#" class="inline-flex items-center gap-1.5 text-xs font-semibold text-ember hover:text-ember-glow transition-colors focus:outline-none focus:underline">
+                Read Guide
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 2: Character Builds -->
+          <article class="card-shine group relative bg-ash rounded-2xl overflow-hidden border border-white/5 shadow-card hover:border-ember/40 hover:-translate-y-1.5 transition-all duration-300 focus-within:ring-2 focus-within:ring-ember">
+            <div class="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80"
+                alt="Dark fantasy warrior character"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-ash via-ash/40 to-transparent"></div>
+              <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-violet-600 text-white text-xs font-semibold uppercase tracking-wide">
+                ⚔ Builds
+              </span>
+            </div>
+            <div class="p-5 relative z-10">
+              <h3 class="font-display text-base font-bold text-parchment mb-2 group-hover:text-ember-glow transition-colors">Character Builds</h3>
+              <p class="text-xs text-muted leading-relaxed mb-4">Optimized deck archetypes for Ironclad, Silent, Defect, and Watcher — from Ascension 0 all the way to A20.</p>
+              <a href="#" class="inline-flex items-center gap-1.5 text-xs font-semibold text-ember hover:text-ember-glow transition-colors focus:outline-none focus:underline">
+                Browse Builds
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 3: Card Tier List -->
+          <article class="card-shine group relative bg-ash rounded-2xl overflow-hidden border border-white/5 shadow-card hover:border-ember/40 hover:-translate-y-1.5 transition-all duration-300 focus-within:ring-2 focus-within:ring-ember">
+            <div class="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=600&auto=format&fit=crop&q=80"
+                alt="Playing cards spread on table"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-ash via-ash/40 to-transparent"></div>
+              <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500 text-black text-xs font-semibold uppercase tracking-wide">
+                ★ Tier List
+              </span>
+            </div>
+            <div class="p-5 relative z-10">
+              <h3 class="font-display text-base font-bold text-parchment mb-2 group-hover:text-ember-glow transition-colors">Card Tier List</h3>
+              <p class="text-xs text-muted leading-relaxed mb-4">Every card ranked S through F with detailed reasoning — pick the right cards every draft and never hesitate.</p>
+              <a href="#" class="inline-flex items-center gap-1.5 text-xs font-semibold text-ember hover:text-ember-glow transition-colors focus:outline-none focus:underline">
+                View Tiers
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- Card 4: Boss Strategies -->
+          <article class="card-shine group relative bg-ash rounded-2xl overflow-hidden border border-white/5 shadow-card hover:border-ember/40 hover:-translate-y-1.5 transition-all duration-300 focus-within:ring-2 focus-within:ring-ember">
+            <div class="relative h-44 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=600&auto=format&fit=crop&q=80"
+                alt="Dark monster creature boss art"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-ash via-ash/40 to-transparent"></div>
+              <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ember text-white text-xs font-semibold uppercase tracking-wide">
+                💀 Bosses
+              </span>
+            </div>
+            <div class="p-5 relative z-10">
+              <h3 class="font-display text-base font-bold text-parchment mb-2 group-hover:text-ember-glow transition-colors">Boss Strategies</h3>
+              <p class="text-xs text-muted leading-relaxed mb-4">Detailed attack patterns, intent reading, and counter-strategies for every act boss and elite encounter.</p>
+              <a href="#" class="inline-flex items-center gap-1.5 text-xs font-semibold text-ember hover:text-ember-glow transition-colors focus:outline-none focus:underline">
+                Fight Bosses
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════ INTRO ════════════════ -->
+    <section id="intro" class="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden" aria-labelledby="intro-title">
+      <!-- Ambient ember glow -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-ember/8 blur-3xl pointer-events-none" aria-hidden="true"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-ember/6 blur-3xl pointer-events-none" aria-hidden="true"></div>
+
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+
+          <!-- Image side -->
+          <div class="relative order-2 lg:order-1">
+            <div class="rounded-2xl overflow-hidden shadow-card border border-white/5">
+              <img
+                src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80"
+                alt="Retro pixel gaming screen glowing in dark"
+                class="w-full h-72 sm:h-96 object-cover"
+                loading="lazy"
+              />
+            </div>
+            <!-- Floating badge -->
+            <div class="absolute -bottom-5 -right-3 bg-ash border border-white/10 rounded-xl px-5 py-4 shadow-card">
+              <p class="text-xs text-muted uppercase tracking-widest mb-1">Community Rated</p>
+              <div class="flex items-center gap-2">
+                <div class="flex">
+                  <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+                <span class="font-semibold text-parchment text-sm">4.9/5</span>
+              </div>
+              <p class="text-xs text-muted mt-1">from 2,400+ readers</p>
+            </div>
+          </div>
+
+          <!-- Text side -->
+          <div class="order-1 lg:order-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-ember mb-4">About SpireGuide</p>
+            <h2 id="intro-title" class="font-display text-3xl sm:text-4xl font-bold text-parchment leading-snug mb-6">
+              Built by players,<br/>for players who want to win.
+            </h2>
+            <p class="text-muted leading-relaxed mb-5">
+              SpireGuide started when a group of high-ascension players got tired of outdated wikis and vague Reddit threads. Every guide here is written after hundreds of runs, tested at Ascension 20, and updated with each major patch.
+            </p>
+            <p class="text-muted leading-relaxed mb-8">
+              Whether you're on your first run or hunting the Heart at A20H, we cover the full spectrum — from how Block works to frame-perfect intent reading on The Awakened One.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-ash rounded-xl p-4 border border-white/5">
+                <p class="font-display text-xl font-bold text-ember">48+</p>
+                <p class="text-xs text-muted mt-1">In-depth guides</p>
+              </div>
+              <div class="bg-ash rounded-xl p-4 border border-white/5">
+                <p class="font-display text-xl font-bold text-ember">Weekly</p>
+                <p class="text-xs text-muted mt-1">Patch updates</p>
+              </div>
+              <div class="bg-ash rounded-xl p-4 border border-white/5">
+                <p class="font-display text-xl font-bold text-ember">Free</p>
+                <p class="text-xs text-muted mt-1">No paywalls, ever</p>
+              </div>
+              <div class="bg-ash rounded-xl p-4 border border-white/5">
+                <p class="font-display text-xl font-bold text-ember">Discord</p>
+                <p class="text-xs text-muted mt-1">Active community</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════ CTA BANNER ════════════════ -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-ash border-y border-white/5" aria-label="Call to action">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-parchment mb-4">Ready to climb the Spire?</h2>
+        <p class="text-muted mb-8 leading-relaxed">Join thousands of players who've improved their win rate using our guides. No account needed — just dive in.</p>
+        <a href="#cards" class="btn-ember inline-flex items-center gap-2 px-8 py-4 bg-ember text-white font-semibold rounded-xl text-sm shadow-ember focus:outline-none focus:ring-2 focus:ring-ember focus:ring-offset-2 focus:ring-offset-ash">
+          Browse All Guides
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ════════════════ FOOTER ════════════════ -->
+  <footer class="bg-ink border-t border-white/5 py-12 px-4 sm:px-6 lg:px-8" aria-label="Footer">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+
+        <!-- Brand -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-md bg-ember flex items-center justify-center shadow-ember">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+              </svg>
+            </div>
+            <span class="font-display text-sm font-bold tracking-widest text-parchment">
+              SPIRE<span class="text-ember">GUIDE</span>
+            </span>
+          </div>
+          <p class="text-sm text-muted leading-relaxed max-w-xs">
+            The most comprehensive Slay the Spire 2 strategy resource — written by dedicated players, updated every patch.
+          </p>
+        </div>
+
+        <!-- Guides -->
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-parchment mb-4">Guides</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Beginner Guide</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Character Builds</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Card Tier List</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Boss Strategies</a></li>
+          </ul>
+        </div>
+
+        <!-- Community -->
+        <div>
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-parchment mb-4">Community</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Discord Server</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Patch Notes</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Submit a Build</a></li>
+            <li><a href="#" class="text-sm text-muted hover:text-ember transition-colors">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p class="text-xs text-muted">
+          &copy; 2025 SpireGuide. Fan site — not affiliated with Mega Crit Games.
+        </p>
+        <p class="text-xs text-muted">
+          Made with <span class="text-ember" aria-label="love">♥</span> for the Slay the Spire community.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Card Tier List · Slay the Spire 2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        void:    '#0d1117',
+        abyss:   '#111827',
+        pit:     '#1a2332',
+        dungeon: '#1f2d40',
+        wall:    '#263348',
+        stone:   '#374151',
+        dust:    '#6b7280',
+        ash:     '#9ca3af',
+        bone:    '#d1d5db',
+        ghost:   '#f3f4f6',
+        ember:   '#ef4444',
+        flame:   '#dc2626',
+        spark:   '#fca5a5',
+        gold:    '#f59e0b',
+        gilded:  '#fbbf24',
+        jade:    '#10b981',
+        sky:     '#38bdf8',
+        rune:    '#a78bfa',
+      },
+      fontFamily: {
+        display: ['Cinzel', 'serif'],
+        mono:    ['IBM Plex Mono', 'monospace'],
+        body:    ['Inter', 'system-ui', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  /* ─── Reset & base ───────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0d1117;
+    color: #f3f4f6;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #0d1117; }
+  ::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+
+  /* ─── Signature element: Card-flip tooltip ───── */
+  /* Each .game-card has a front face visible by default.
+     On hover, the card "lifts" and shows a tooltip beneath,
+     styled like a real card's rules text box.            */
+  .game-card {
+    position: relative;
+    cursor: default;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transform-origin: bottom center;
+  }
+  .game-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    z-index: 20;
+  }
+  .card-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    background: #0d1117;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    line-height: 1.55;
+    color: #d1d5db;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease 0.1s;
+    z-index: 50;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    white-space: normal;
+    text-align: left;
+  }
+  .card-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #374151;
+  }
+  .game-card:hover .card-tooltip { opacity: 1; }
+  /* keep tooltip within left edge on mobile */
+  @media (max-width: 480px) {
+    .card-tooltip { left: 0; transform: none; }
+    .card-tooltip::after { left: 30px; }
+  }
+
+  /* ─── Tier row ───────────────────────────────── */
+  .tier-row {
+    display: flex;
+    align-items: stretch;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid;
+  }
+  .tier-label-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    flex-shrink: 0;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: 0.12em;
+    user-select: none;
+  }
+  @media (min-width: 640px) { .tier-label-col { width: 64px; font-size: 2rem; } }
+  .tier-cards-area {
+    flex: 1;
+    padding: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
+  }
+  @media (min-width: 640px) { .tier-cards-area { padding: 18px 20px; gap: 10px; } }
+
+  /* ─── Tier colour tokens ─────────────────────── */
+  /* S – gold */
+  .tier-s { border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.04); }
+  .tier-s .tier-label-col { color: #f59e0b; background: rgba(245,158,11,0.08); border-right: 1px solid rgba(245,158,11,0.25); }
+  .tier-s .game-card { border-color: rgba(245,158,11,0.28); background: rgba(245,158,11,0.07); }
+  .tier-s .game-card:hover { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245,158,11,0.25); }
+  .tier-s .card-cost { color: #f59e0b; }
+
+  /* A – jade */
+  .tier-a { border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.03); }
+  .tier-a .tier-label-col { color: #10b981; background: rgba(16,185,129,0.07); border-right: 1px solid rgba(16,185,129,0.22); }
+  .tier-a .game-card { border-color: rgba(16,185,129,0.22); background: rgba(16,185,129,0.05); }
+  .tier-a .game-card:hover { border-color: #10b981; box-shadow: 0 0 18px rgba(16,185,129,0.2); }
+  .tier-a .card-cost { color: #10b981; }
+
+  /* B – sky */
+  .tier-b { border-color: rgba(56,189,248,0.25); background: rgba(56,189,248,0.025); }
+  .tier-b .tier-label-col { color: #38bdf8; background: rgba(56,189,248,0.07); border-right: 1px solid rgba(56,189,248,0.2); }
+  .tier-b .game-card { border-color: rgba(56,189,248,0.2); background: rgba(56,189,248,0.04); }
+  .tier-b .game-card:hover { border-color: #38bdf8; box-shadow: 0 0 16px rgba(56,189,248,0.18); }
+  .tier-b .card-cost { color: #38bdf8; }
+
+  /* C – stone */
+  .tier-c { border-color: rgba(55,65,81,0.6); background: rgba(55,65,81,0.06); }
+  .tier-c .tier-label-col { color: #6b7280; background: rgba(55,65,81,0.15); border-right: 1px solid rgba(55,65,81,0.4); }
+  .tier-c .game-card { border-color: rgba(55,65,81,0.45); background: rgba(55,65,81,0.1); }
+  .tier-c .game-card:hover { border-color: #6b7280; box-shadow: 0 0 12px rgba(107,114,128,0.15); }
+  .tier-c .card-cost { color: #9ca3af; }
+
+  /* ─── Individual card chip ───────────────────── */
+  .game-card {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 8px;
+    padding: 8px 10px 7px;
+    min-width: 100px;
+    max-width: 130px;
+    flex-shrink: 0;
+  }
+  @media (min-width: 640px) { .game-card { min-width: 115px; max-width: 145px; padding: 9px 12px 8px; } }
+  .card-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #f3f4f6;
+    line-height: 1.3;
+    margin-bottom: 3px;
+  }
+  @media (min-width: 640px) { .card-name { font-size: 12.5px; } }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .card-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .type-atk { background: rgba(239,68,68,0.15); color: #fca5a5; }
+  .type-skl { background: rgba(56,189,248,0.13); color: #7dd3fc; }
+  .type-pwr { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+  .card-cost {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: auto;
+  }
+
+  /* ─── Table ──────────────────────────────────── */
+  .notes-table { width: 100%; border-collapse: collapse; }
+  .notes-table th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6b7280;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #1f2d40;
+  }
+  .notes-table td {
+    padding: 11px 14px;
+    font-size: 12.5px;
+    color: #d1d5db;
+    border-bottom: 1px solid #1a2332;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .notes-table tr:last-child td { border-bottom: none; }
+  .notes-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .notes-table td:first-child { font-weight: 600; color: #f3f4f6; white-space: nowrap; }
+
+  /* ─── Tip cards ──────────────────────────────── */
+  .tip-card {
+    border-left: 3px solid #ef4444;
+    background: rgba(239,68,68,0.04);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+  }
+
+  /* ─── Divider rule ───────────────────────────── */
+  .ember-rule {
+    height: 1px;
+    background: linear-gradient(90deg, #ef4444 0%, rgba(239,68,68,0.2) 50%, transparent 100%);
+  }
+
+  /* ─── Nav ────────────────────────────────────── */
+  .nav-blur {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  /* ─── Reduced motion ──────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .game-card { transition: none; }
+    .game-card:hover { transform: none; }
+    .card-tooltip { transition: none; }
+  }
+
+  /* ─── Tier jump links ─────────────────────────── */
+  .jump-btn {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid;
+    transition: background 0.15s, color 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .jump-s { color: #f59e0b; border-color: rgba(245,158,11,0.35); }
+  .jump-s:hover { background: rgba(245,158,11,0.12); }
+  .jump-a { color: #10b981; border-color: rgba(16,185,129,0.3); }
+  .jump-a:hover { background: rgba(16,185,129,0.1); }
+  .jump-b { color: #38bdf8; border-color: rgba(56,189,248,0.3); }
+  .jump-b:hover { background: rgba(56,189,248,0.08); }
+  .jump-c { color: #9ca3af; border-color: rgba(107,114,128,0.4); }
+  .jump-c:hover { background: rgba(107,114,128,0.1); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+  NAV
+════════════════════════════════════════ -->
+<nav class="fixed top-0 inset-x-0 z-50 nav-blur border-b border-white/5" style="background:rgba(13,17,23,0.88)">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between" style="height:52px">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2.5 group" aria-label="SpireGuide home">
+      <div class="w-7 h-7 rounded flex items-center justify-center flex-shrink-0"
+           style="background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.4)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+          <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+        </svg>
+      </div>
+      <span class="font-display text-xs font-bold tracking-widest text-ghost hidden sm:block">
+        SPIRE<span style="color:#ef4444">GUIDE</span>
+      </span>
+    </a>
+    <!-- Nav links -->
+    <div class="flex items-center gap-1 text-xs text-dust font-medium">
+      <a href="#" class="px-3 py-2 rounded hover:text-ghost hover:bg-white/5 transition-colors hidden sm:block">Guides</a>
+      <a href="#" class="px-3 py-2 rounded hover:text-ghost hover:bg-white/5 transition-colors hidden sm:block">Builds</a>
+      <span class="px-3 py-2 text-ghost font-semibold border-b-2 border-ember" style="border-color:#ef4444">Tier List</span>
+      <span class="ml-3 flex items-center gap-1.5 text-ember px-2.5 py-1 rounded-full border text-xs font-semibold font-mono"
+            style="color:#ef4444;border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.07)">
+        <span class="w-1.5 h-1.5 rounded-full bg-ember animate-pulse inline-block" style="background:#ef4444"></span>
+        EA·P7
+      </span>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+  HERO
+════════════════════════════════════════ -->
+<header style="padding-top:80px;padding-bottom:56px;position:relative;overflow:hidden">
+
+  <!-- Background image strip -->
+  <div style="position:absolute;inset:0;z-index:0;overflow:hidden">
+    <img src="https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=1400&auto=format&fit=crop&q=70"
+         alt="" aria-hidden="true"
+         style="width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(0.18) saturate(0.6)"/>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,17,23,0.4) 0%,rgba(13,17,23,0.85) 60%,#0d1117 100%)"></div>
+    <!-- Red ember glow top-left -->
+    <div style="position:absolute;top:-60px;left:-60px;width:320px;height:320px;border-radius:50%;background:rgba(239,68,68,0.07);filter:blur(60px);pointer-events:none"></div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 relative" style="z-index:1">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-1.5 text-xs mb-6" style="color:#6b7280" aria-label="Breadcrumb">
+      <a href="#" class="hover:text-ash transition-colors" style="color:inherit">Home</a>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5l7 7-7 7"/></svg>
+      <span style="color:#9ca3af">Card Tier List</span>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row lg:items-end gap-8">
+
+      <!-- Headline block -->
+      <div class="flex-1">
+        <!-- Eyebrow -->
+        <p class="font-mono text-xs font-semibold tracking-widest mb-3 uppercase"
+           style="color:#ef4444;letter-spacing:0.2em">Universal Cards · All Characters</p>
+
+        <h1 class="font-display font-black leading-none mb-5"
+            style="font-size:clamp(2.2rem,6vw,3.8rem);color:#f3f4f6">
+          Card<br/>
+          <span style="color:#ef4444;text-shadow:0 0 40px rgba(239,68,68,0.3)">Tier List</span>
+        </h1>
+
+        <p style="max-width:520px;color:#9ca3af;font-size:14px;line-height:1.7">
+          Every universal card ranked S–C, based on raw floor value, upgrade ceiling, and
+          performance from Ascension 0 through A20. Hover any card to read its impact note.
+          Cards are judged standalone — synergies can shift things, but this tells you
+          <em style="color:#d1d5db">what to pick when you're unsure.</em>
+        </p>
+
+        <!-- Tier jump row -->
+        <div class="flex flex-wrap gap-2 mt-6">
+          <a href="#tier-s" class="jump-btn jump-s">S Tier</a>
+          <a href="#tier-a" class="jump-btn jump-a">A Tier</a>
+          <a href="#tier-b" class="jump-btn jump-b">B Tier</a>
+          <a href="#tier-c" class="jump-btn jump-c">C Tier</a>
+          <a href="#notes" class="jump-btn" style="color:#9ca3af;border-color:rgba(107,114,128,0.3)">Notes & Tips</a>
+        </div>
+      </div>
+
+      <!-- Legend card -->
+      <div class="flex-shrink-0 rounded-xl border p-5"
+           style="min-width:210px;background:#111827;border-color:#1f2d40">
+        <p class="font-mono text-xs font-semibold uppercase tracking-widest mb-4" style="color:#6b7280">Tier Key</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="font-display font-black text-lg w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                  style="color:#f59e0b;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3)">S</span>
+            <div>
+              <p style="font-size:12px;font-weight:600;color:#f3f4f6">Must-pick</p>
+              <p style="font-size:11px;color:#6b7280;line-height:1.4">Always draft; win-condition level</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="font-display font-black text-lg w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                  style="color:#10b981;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.28)">A</span>
+            <div>
+              <p style="font-size:12px;font-weight:600;color:#f3f4f6">Strong pick</p>
+              <p style="font-size:11px;color:#6b7280;line-height:1.4">Take in most decks, slightly deck-dependent</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="font-display font-black text-lg w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                  style="color:#38bdf8;background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.25)">B</span>
+            <div>
+              <p style="font-size:12px;font-weight:600;color:#f3f4f6">Situational</p>
+              <p style="font-size:11px;color:#6b7280;line-height:1.4">Good in the right build; skip if unsure</p>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="font-display font-black text-lg w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                  style="color:#9ca3af;background:rgba(55,65,81,0.15);border:1px solid rgba(55,65,81,0.5)">C</span>
+            <div>
+              <p style="font-size:12px;font-weight:600;color:#f3f4f6">Weak / Filler</p>
+              <p style="font-size:11px;color:#6b7280;line-height:1.4">Only take when nothing better exists</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════
+  TIER LIST
+════════════════════════════════════════ -->
+<main class="max-w-5xl mx-auto px-4 sm:px-6" style="padding-bottom:80px">
+
+  <!-- Small image accent strip -->
+  <div class="grid grid-cols-3 gap-3 mb-10" style="max-width:380px">
+    <div class="rounded-lg overflow-hidden" style="height:64px">
+      <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&auto=format&fit=crop&q=70"
+           alt="Dark dungeon" class="w-full h-full object-cover" style="filter:brightness(0.55) saturate(0.7)"/>
+    </div>
+    <div class="rounded-lg overflow-hidden" style="height:64px">
+      <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&auto=format&fit=crop&q=70"
+           alt="Fantasy warrior" class="w-full h-full object-cover" style="filter:brightness(0.5) saturate(0.6)"/>
+    </div>
+    <div class="rounded-lg overflow-hidden" style="height:64px">
+      <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&auto=format&fit=crop&q=70"
+           alt="Dark fire" class="w-full h-full object-cover" style="filter:brightness(0.45) saturate(0.7) hue-rotate(-10deg)"/>
+    </div>
+  </div>
+
+  <!-- ── S TIER ─────────────────────── -->
+  <section id="tier-s" aria-label="S Tier" style="margin-bottom:12px">
+    <div class="tier-row tier-s">
+      <div class="tier-label-col">S</div>
+      <div class="tier-cards-area">
+
+        <div class="game-card">
+          <p class="card-name">Inflame</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Ironclad · Power · 1 Energy</strong><br/>
+            Gain 2 Strength (3 upgraded). A single copy changes the entire damage ceiling of a run. Never skip.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Limit Break</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Ironclad · Skill · 1 Energy</strong><br/>
+            Double your Strength. Upgraded: no Exhaust. Loops with Demon Form — turns +8 Strength into +64 in two turns.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Dark Embrace</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Ironclad · Power · 2 Energy</strong><br/>
+            Draw 1 card whenever you Exhaust. Turns every Offering or Fiend Fire into net card advantage. Core Exhaust engine.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Feel No Pain</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Ironclad · Power · 1 Energy</strong><br/>
+            Gain 3 Block whenever you Exhaust (4 upgraded). Stack two copies: Fiend Fire generates 30+ Block in one play.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Catalyst</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Silent · Skill · 1 Energy</strong><br/>
+            Double a target's Poison (triple upgraded). Exhaust. 10 Poison → 20 → 40 over two turns. Turns slow burn into a nuke.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Wraith Form</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">3⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Silent · Power · 3 Energy</strong><br/>
+            Gain 3 Intangible (take 1 damage from everything). Lose 1 Dex/turn. Near-invincibility for 3 turns — wins most boss fights alone.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Defragment</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Defect · Power · 1 Energy</strong><br/>
+            Gain 1 Focus (2 upgraded). Focus multiplies every Orb's passive effect. Scales quadratically with Orb count.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Meditate</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Watcher · Skill · 1 Energy</strong><br/>
+            Return up to 3 cards from discard to hand. Enter Calm. Refuels the Watcher's stance-swap loop — the heart of the archetype.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Corruption</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">3⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Ironclad · Power · 3 Energy</strong><br/>
+            Skills cost 0 but Exhaust. Lets you play entire hand of Skills in one turn, generating enormous Feel No Pain block and Dark Embrace draw.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">After Image</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#f59e0b">Silent · Power · 1 Energy</strong><br/>
+            Gain 1 Block whenever you play a card. In a Shiv deck you gain 3+ Block before attacking, making Shiv damage essentially free.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── A TIER ─────────────────────── -->
+  <section id="tier-a" aria-label="A Tier" style="margin-bottom:12px">
+    <div class="tier-row tier-a">
+      <div class="tier-label-col">A</div>
+      <div class="tier-cards-area">
+
+        <div class="game-card">
+          <p class="card-name">Demon Form</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">3⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Ironclad · Power · 3 Energy</strong><br/>
+            Gain 2 Strength at start of each turn (3 upgraded). Passive scaling that trivialises long boss fights by design.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Heavy Blade</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Ironclad · Attack · 2 Energy</strong><br/>
+            14 damage; Strength applies ×3 (×5 upgraded). At +15 Strength (upgraded) this hits for 89 damage per swing.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Fiend Fire</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Ironclad · Attack · 2 Energy</strong><br/>
+            Exhaust hand, deal 7 per card Exhausted. Triggers Feel No Pain for each — combines burst damage and bulk block.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Blade Dance</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Silent · Skill · 1 Energy</strong><br/>
+            Add 3 Shivs to hand (4 upgraded). Feeds Accuracy, After Image, and Ninjutsu — a density engine for the Shiv archetype.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Accuracy</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Silent · Power · 1 Energy</strong><br/>
+            Shivs deal 4 more damage (6 upgraded). Stacks. Three copies make Blade Dance hit for 30 total damage every 1 Energy spent.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Offering</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">0⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Ironclad · Skill · 0 Energy</strong><br/>
+            Lose 6 HP, gain 2 Energy, draw 3. Exhaust. Triggers both Feel No Pain and Dark Embrace simultaneously — best draw card in the game.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Ball Lightning</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Defect · Attack · 1 Energy</strong><br/>
+            Deal 7 damage, channel 1 Lightning. Efficient turn-1 setup for Storm or Electrodynamics — damage with free Orb channelling.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Glacier</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Defect · Skill · 2 Energy</strong><br/>
+            Gain 7 Block, channel 2 Frost. Dual-purpose defence and Orb setup. Best defensive non-power the Defect has.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Eruption</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Watcher · Attack · 2 Energy</strong><br/>
+            9 damage, enter Wrath. Upgraded costs 1. Core of the stance-swap engine — cheap Wrath entry every cycle.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Nightmare</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">3⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Silent · Skill · 3 Energy</strong><br/>
+            Choose a card in hand; add 3 copies of it next turn. Exhaust. Triples Catalyst, Shiv generators, or any key card.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Biased Cog.</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Defect · Power · 1 Energy</strong><br/>
+            Orbs trigger passively at start of turn (twice upgraded). Doubles all Orb effects without any extra channelling each turn.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Backflip</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#10b981">Silent · Skill · 1 Energy</strong><br/>
+            Gain 5 Block, draw 2 cards. No downside, pure card advantage and defence. Always take; always upgrade first.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── B TIER ─────────────────────── -->
+  <section id="tier-b" aria-label="B Tier" style="margin-bottom:12px">
+    <div class="tier-row tier-b">
+      <div class="tier-label-col">B</div>
+      <div class="tier-cards-area">
+
+        <div class="game-card">
+          <p class="card-name">Pommel Strike</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Ironclad · Attack · 1 Energy</strong><br/>
+            9 damage, draw 1 (draw 2 upgraded). Attacks that cycle your deck are always solid. A reliable bridge card in early Act 1.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Whirlwind</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">X⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Ironclad · Attack · X Energy</strong><br/>
+            Spend all Energy; deal 5× per Energy to ALL enemies (8× upgraded). Excellent in multi-enemy fights, weaker single-target.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Second Wind</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Ironclad · Skill · 1 Energy</strong><br/>
+            Exhaust all non-Attack cards in hand, gain 5 Block per card. Emergency survival tool — pairs with Feel No Pain for Block on Block.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Predator</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Silent · Attack · 2 Energy</strong><br/>
+            15 damage, draw 2 next turn. Best in slow decks that need future-turn fuel. The draw is real late-game value.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Eviscerate</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">3⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Silent · Attack · 3 Energy</strong><br/>
+            Deal 7 damage 3 times. Costs 1 less per discard this turn. 0-cost burst with discard support — great in shiv-discard decks.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Trip</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">0⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Silent · Skill · 0 Energy</strong><br/>
+            Apply 2 Vulnerable to all enemies. A 0-cost Vulnerable setup for a Catalyst Poison hit turns into enormous damage per energy.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Chill</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">0⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Defect · Skill · 0 Energy</strong><br/>
+            Channel 1 Frost per enemy. Innate. Great opener in multi-enemy rooms; mediocre vs single targets.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Amplify</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Defect · Skill · 1 Energy</strong><br/>
+            Next Power card is played twice (all Powers this turn upgraded). High ceiling with Defragment or Echo Form; dead without targets.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Vigilance</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Watcher · Skill · 2 Energy</strong><br/>
+            8 Block, enter Calm (12 upgraded). Cheap Calm entry when Eruption isn't in hand. Solid defensive filler early on.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Reach Heaven</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">2⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Watcher · Attack · 2 Energy</strong><br/>
+            10 damage, shuffle Through Violence into draw pile. Upgraded: Through Violence costs 0. That card hits for 50 — a one-time nuke.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Armaments</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Ironclad · Skill · 1 Energy</strong><br/>
+            5 Block, upgrade 1 card (all cards in hand upgraded). Upgraded mid-fight Heavy Blade turns a mediocre hand into a great one.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name">Devotion</p>
+          <div class="card-meta">
+            <span class="card-type type-pwr">Power</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#38bdf8">Watcher · Power · 1 Energy</strong><br/>
+            Gain 2 Mantra/turn (3 upgraded). At 10 Mantra, enter Divinity for free Wrath-level damage. Strong but slow to come online.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── C TIER ─────────────────────── -->
+  <section id="tier-c" aria-label="C Tier" style="margin-bottom:48px">
+    <div class="tier-row tier-c">
+      <div class="tier-label-col">C</div>
+      <div class="tier-cards-area">
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Strike</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">All Characters · Attack · 1 Energy</strong><br/>
+            Deal 6 damage (9 upgraded). Your starting card. Remove as fast as possible — it dilutes every subsequent draw. Never add more.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Defend</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">All Characters · Skill · 1 Energy</strong><br/>
+            Gain 5 Block (8 upgraded). Starting card. Remove unless you have no other block option. Impervious replaces it by Act 2.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Flex</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">0⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Ironclad · Skill · 0 Energy</strong><br/>
+            Gain 2 Strength, lose it at end of turn. Only helps attacks played the same turn. Inflame does the same job permanently for 1 Energy.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Cleave</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Ironclad · Attack · 1 Energy</strong><br/>
+            Deal 8 damage to all enemies. Weak damage for AoE. Only useful in Act 1 multi-enemy rooms; replace at first opportunity.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Sword Boomerang</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Ironclad · Attack · 1 Energy</strong><br/>
+            Deal 3 damage to random enemies 3×. Random targeting wastes damage on near-dead enemies. Skip unless you truly need an attack.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Dagger Throw</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Silent · Attack · 1 Energy</strong><br/>
+            Deal 9 damage, discard 1 card. Discard has situational synergy but the base attack is mediocre. Skip for anything A or B tier.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Sucker Punch</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Silent · Attack · 1 Energy</strong><br/>
+            Deal 7 damage, apply 1 Weak. Low damage. Weak is useful but doesn't compensate for how mediocre the base attack is on its own.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Zap</p>
+          <div class="card-meta">
+            <span class="card-type type-skl">Skill</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Defect · Skill · 1 Energy</strong><br/>
+            Channel 1 Lightning, no damage. Ball Lightning does the same thing but also hits for 7. Never take Zap if Ball Lightning is offered.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Cold Snap</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">1⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Defect · Attack · 1 Energy</strong><br/>
+            6 damage, channel 1 Frost. Outclassed by Ball Lightning at the same cost — Lightning is a far more aggressive Orb type.
+          </div>
+        </div>
+
+        <div class="game-card">
+          <p class="card-name" style="color:#9ca3af">Consecrate</p>
+          <div class="card-meta">
+            <span class="card-type type-atk">Attack</span>
+            <span class="card-cost">0⚡</span>
+          </div>
+          <div class="card-tooltip">
+            <strong style="color:#9ca3af">Watcher · Attack · 0 Energy</strong><br/>
+            5 AoE damage, no stance interaction. The Watcher should never waste card slots on no-synergy AoE when Conclude exists.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════
+    NOTES SECTION
+  ════════════════════════════════════════ -->
+  <section id="notes" aria-labelledby="notes-heading">
+    <div class="ember-rule mb-8"></div>
+
+    <div class="flex flex-col lg:flex-row gap-10">
+
+      <!-- ── Top-card notes table ────────── -->
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="font-display font-black text-xl w-9 h-9 rounded flex items-center justify-center flex-shrink-0"
+                style="color:#f59e0b;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3)">S</span>
+          <div>
+            <h2 id="notes-heading" class="font-display text-lg font-bold" style="color:#f3f4f6">Top-Tier Card Notes</h2>
+            <p class="text-xs" style="color:#6b7280">Why these cards change runs</p>
+          </div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden border" style="border-color:#1f2d40">
+          <table class="notes-table">
+            <thead>
+              <tr style="background:#111827">
+                <th>Card</th>
+                <th>Char</th>
+                <th>Why it's S-tier</th>
+                <th>Upgrade?</th>
+              </tr>
+            </thead>
+            <tbody style="background:#0d1117">
+              <tr>
+                <td>Inflame</td>
+                <td style="color:#9ca3af;white-space:nowrap">Ironclad</td>
+                <td>Permanent Strength gain multiplies every attack. Even unupgraded, +2 Str on a 5-card turn is significant extra damage.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981">High</span></td>
+              </tr>
+              <tr>
+                <td>Limit Break</td>
+                <td style="color:#9ca3af;white-space:nowrap">Ironclad</td>
+                <td>Doubles Strength. Upgraded removes Exhaust — play it every turn. With Demon Form, +8 Str becomes +64 in two turns.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(239,68,68,0.12);color:#ef4444">Mandatory</span></td>
+              </tr>
+              <tr>
+                <td>Catalyst</td>
+                <td style="color:#9ca3af;white-space:nowrap">Silent</td>
+                <td>Doubles Poison (triples upgraded). 10 stacks → 20 → 40 over two turns. Turns slow Poison into a one-shot boss kill.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(239,68,68,0.12);color:#ef4444">Mandatory</span></td>
+              </tr>
+              <tr>
+                <td>Dark Embrace</td>
+                <td style="color:#9ca3af;white-space:nowrap">Ironclad</td>
+                <td>In an Exhaust deck this generates more cards per turn than you can play. Free card advantage on every Exhaust trigger.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981">High</span></td>
+              </tr>
+              <tr>
+                <td>Wraith Form</td>
+                <td style="color:#9ca3af;white-space:nowrap">Silent</td>
+                <td>3 turns of near-invincibility. Acts as a hard reset against any boss — lets you establish board state safely and at leisure.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981">High</span></td>
+              </tr>
+              <tr>
+                <td>Defragment</td>
+                <td style="color:#9ca3af;white-space:nowrap">Defect</td>
+                <td>+1 Focus passively multiplies all Orb effects. Scales quadratically with Orb count — the core stat of every Defect build.</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981">High</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Bad picks list ──────────────── -->
+      <div style="width:100%;max-width:300px;flex-shrink:0">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="font-display font-black text-xl w-9 h-9 rounded flex items-center justify-center flex-shrink-0"
+                style="color:#6b7280;background:rgba(55,65,81,0.2);border:1px solid rgba(55,65,81,0.5)">C</span>
+          <div>
+            <h2 class="font-display text-lg font-bold" style="color:#f3f4f6">Avoid These</h2>
+            <p class="text-xs" style="color:#6b7280">Common traps for new players</p>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <div class="rounded-lg border p-4" style="background:#111827;border-color:#1f2d40">
+            <p class="font-semibold text-sm mb-1" style="color:#d1d5db">Strike & Defend (all characters)</p>
+            <p class="text-xs leading-relaxed" style="color:#6b7280">Your starting cards. Remove at every opportunity — a 10-card deck with 0 Strikes beats a 20-card deck every time by cycling faster to your win condition.</p>
+          </div>
+
+          <div class="rounded-lg border p-4" style="background:#111827;border-color:#1f2d40">
+            <p class="font-semibold text-sm mb-1" style="color:#d1d5db">Flex (Ironclad)</p>
+            <p class="text-xs leading-relaxed" style="color:#6b7280">The temporary Strength misleads new players. It only helps attacks played in the same turn. Inflame does the same job permanently for 1 Energy.</p>
+          </div>
+
+          <div class="rounded-lg border p-4" style="background:#111827;border-color:#1f2d40">
+            <p class="font-semibold text-sm mb-1" style="color:#d1d5db">Zap (Defect)</p>
+            <p class="text-xs leading-relaxed" style="color:#6b7280">Costs 1 Energy to channel 1 Lightning with no damage. Ball Lightning does exactly the same thing but also deals 7 damage. Never choose Zap.</p>
+          </div>
+
+          <div class="rounded-lg border p-4" style="background:#111827;border-color:#1f2d40">
+            <p class="font-semibold text-sm mb-1" style="color:#d1d5db">Consecrate (Watcher)</p>
+            <p class="text-xs leading-relaxed" style="color:#6b7280">5 AoE with no stance effect wastes a card slot that should go to stance-swap cards. The Watcher's damage model doesn't need cheap filler attacks.</p>
+          </div>
+
+          <div class="rounded-lg border p-4" style="background:#111827;border-color:#1f2d40">
+            <p class="font-semibold text-sm mb-1" style="color:#d1d5db">Sword Boomerang</p>
+            <p class="text-xs leading-relaxed" style="color:#6b7280">Random targeting wastes damage on near-dead enemies. The Ironclad needs focused burst, not scatter damage — skip this entirely.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<!-- ════════════════════════════════════════
+  NEW PLAYER TIPS
+════════════════════════════════════════ -->
+<section id="newplayer" aria-labelledby="tips-heading"
+         style="background:#111827;border-top:1px solid #1f2d40;border-bottom:1px solid #1f2d40;padding:64px 0">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+
+      <!-- Image + stat -->
+      <div style="flex-shrink:0;width:100%;max-width:220px">
+        <div class="rounded-xl overflow-hidden border mb-4" style="border-color:#1f2d40">
+          <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=70"
+               alt="Glowing game screen" class="w-full" style="height:160px;object-fit:cover;filter:brightness(0.5) saturate(0.6)"/>
+        </div>
+        <div class="rounded-xl border p-4" style="background:#0d1117;border-color:#1f2d40">
+          <p class="font-mono text-xs uppercase tracking-widest mb-1" style="color:#6b7280">Ideal Deck Size</p>
+          <p class="font-display text-3xl font-black" style="color:#ef4444">10–15</p>
+          <p class="text-xs mt-1" style="color:#6b7280">cards at Ascension 0</p>
+        </div>
+
+        <!-- Image 2 -->
+        <div class="rounded-xl overflow-hidden border mt-4" style="border-color:#1f2d40">
+          <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&auto=format&fit=crop&q=70"
+               alt="Dark digital matrix" class="w-full" style="height:100px;object-fit:cover;filter:brightness(0.4) saturate(0.5)"/>
+        </div>
+      </div>
+
+      <!-- Tips content -->
+      <div class="flex-1">
+        <p class="font-mono text-xs font-semibold uppercase tracking-widest mb-2" style="color:#ef4444;letter-spacing:0.18em">For New Players</p>
+        <h2 id="tips-heading" class="font-display text-2xl sm:text-3xl font-bold mb-3" style="color:#f3f4f6">Quick Draft Guide</h2>
+        <p class="text-sm leading-relaxed mb-8" style="color:#9ca3af;max-width:520px">
+          You don't need to memorise every tier on your first run. These five rules cover 90% of draft decisions and stop the most common early mistakes.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-8">
+
+          <div class="tip-card">
+            <p class="font-semibold text-sm mb-1" style="color:#f3f4f6">Smaller deck = faster wins</p>
+            <p class="text-xs leading-relaxed" style="color:#9ca3af">Every card you add risks drawing it at the wrong moment. Aim for 10–15 cards by Act 2. Skip anything that isn't better than half your deck.</p>
+          </div>
+
+          <div class="tip-card">
+            <p class="font-semibold text-sm mb-1" style="color:#f3f4f6">Remove Strikes and Defends first</p>
+            <p class="text-xs leading-relaxed" style="color:#9ca3af">Use every removal event and pay shop prices to cut your starting cards. A lean deck finds win conditions consistently.</p>
+          </div>
+
+          <div class="tip-card">
+            <p class="font-semibold text-sm mb-1" style="color:#f3f4f6">Upgrade your win-condition card first</p>
+            <p class="text-xs leading-relaxed" style="color:#9ca3af">A +1 on Bash is nice. Upgrading Limit Break to remove Exhaust, or Catalyst to triple Poison — those are game-changing. Do those first at Campfire.</p>
+          </div>
+
+          <div class="tip-card">
+            <p class="font-semibold text-sm mb-1" style="color:#f3f4f6">Commit to one archetype</p>
+            <p class="text-xs leading-relaxed" style="color:#9ca3af">If you're going Strength, skip Exhaust cards and vice versa. Mixed builds are unreliable. Decide on floor 3 and draft everything toward it.</p>
+          </div>
+
+        </div>
+
+        <!-- Quick decision table -->
+        <h3 class="font-display text-base font-bold mb-4" style="color:#f3f4f6">Instant Decision Table</h3>
+        <div class="rounded-xl overflow-hidden border" style="border-color:#1f2d40">
+          <table class="notes-table">
+            <thead>
+              <tr style="background:#0d1117">
+                <th>Situation</th>
+                <th>Action</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody style="background:#111827">
+              <tr>
+                <td>Offered an S-tier card</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981;white-space:nowrap">Always take</span></td>
+                <td>Worth building the entire run around</td>
+              </tr>
+              <tr>
+                <td>Offered 3 C-tier cards</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(107,114,128,0.15);color:#9ca3af;white-space:nowrap">Skip all</span></td>
+                <td>A smaller clean deck beats a polluted one</td>
+              </tr>
+              <tr>
+                <td>Campfire in Act 1</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(56,189,248,0.12);color:#38bdf8;white-space:nowrap">Upgrade</span></td>
+                <td>HP is plentiful; upgrades compound through Acts 2 & 3</td>
+              </tr>
+              <tr>
+                <td>Campfire below 50% HP</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(239,68,68,0.12);color:#ef4444;white-space:nowrap">Rest</span></td>
+                <td>Dead players don't get to use their upgrades</td>
+              </tr>
+              <tr>
+                <td>Shop offers card removal</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(16,185,129,0.12);color:#10b981;white-space:nowrap">Buy it</span></td>
+                <td>Remove a Strike or Defend — always worth 75–100g</td>
+              </tr>
+              <tr>
+                <td>Elite visible on map</td>
+                <td><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(56,189,248,0.12);color:#38bdf8;white-space:nowrap">Fight it</span></td>
+                <td>Relic rewards outweigh the HP cost in most runs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+  FOOTER
+════════════════════════════════════════ -->
+<footer style="background:#0d1117;border-top:1px solid #1a2332;padding:48px 0 40px">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+      <!-- Brand -->
+      <div class="col-span-2 sm:col-span-1">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-7 h-7 rounded flex items-center justify-center flex-shrink-0"
+               style="background:#ef4444;box-shadow:0 0 10px rgba(239,68,68,0.3)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+            </svg>
+          </div>
+          <span class="font-display text-xs font-bold tracking-widest" style="color:#f3f4f6">
+            SPIRE<span style="color:#ef4444">GUIDE</span>
+          </span>
+        </div>
+        <p class="text-xs leading-relaxed" style="color:#6b7280">Fan-made strategy resource for Slay the Spire 2. Not affiliated with Mega Crit Games.</p>
+      </div>
+
+      <!-- Tier List -->
+      <div>
+        <p class="font-mono text-xs font-semibold uppercase tracking-widest mb-3" style="color:#9ca3af">Tier List</p>
+        <ul style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <li><a href="#tier-s" style="color:#6b7280" class="hover:text-ghost transition-colors" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">S Tier Cards</a></li>
+          <li><a href="#tier-a" style="color:#6b7280" class="hover:text-ghost transition-colors" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">A Tier Cards</a></li>
+          <li><a href="#tier-b" style="color:#6b7280" class="hover:text-ghost transition-colors" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">B Tier Cards</a></li>
+          <li><a href="#tier-c" style="color:#6b7280" class="hover:text-ghost transition-colors" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">C Tier Cards</a></li>
+        </ul>
+      </div>
+
+      <!-- Guides -->
+      <div>
+        <p class="font-mono text-xs font-semibold uppercase tracking-widest mb-3" style="color:#9ca3af">Guides</p>
+        <ul style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Ironclad Builds</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Silent Builds</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Boss Tips</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Beginner Guide</a></li>
+        </ul>
+      </div>
+
+      <!-- Community -->
+      <div>
+        <p class="font-mono text-xs font-semibold uppercase tracking-widest mb-3" style="color:#9ca3af">Community</p>
+        <ul style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Discord</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Patch Notes</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Submit a Build</a></li>
+          <li><a href="#" style="color:#6b7280" onmouseover="this.style.color='#f3f4f6'" onmouseout="this.style.color='#6b7280'">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #1a2332;padding-top:24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
+      <p class="text-xs" style="color:#374151">&copy; 2025 SpireGuide — Fan site. Not affiliated with Mega Crit Games.</p>
+      <p class="text-xs" style="color:#374151">Made with <span style="color:#ef4444">♥</span> for the Slay the Spire community · EA Patch 7</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

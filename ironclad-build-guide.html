@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ironclad Build Guide — Slay the Spire 2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink:        '#111827',
+            ink2:       '#1a2235',
+            slate:      '#1f2937',
+            slate2:     '#263044',
+            border:     '#2d3748',
+            muted:      '#6b7280',
+            soft:       '#9ca3af',
+            parchment:  '#f9fafb',
+            red:        '#ef4444',
+            'red-dim':  '#b91c1c',
+            'red-pale': '#fca5a5',
+            'red-bg':   'rgba(239,68,68,0.08)',
+            gold:       '#f59e0b',
+            'gold-bg':  'rgba(245,158,11,0.08)',
+            blue:       '#60a5fa',
+            'blue-bg':  'rgba(96,165,250,0.08)',
+            purple:     '#a78bfa',
+            'purple-bg':'rgba(167,139,250,0.08)',
+            green:      '#34d399',
+            'green-bg': 'rgba(52,211,153,0.08)',
+          },
+          fontFamily: {
+            display: ['"Cinzel"', 'Georgia', 'serif'],
+            body:    ['"Inter"',  'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { font-size: 16px; }
+    body { background: #111827; color: #f9fafb; -webkit-font-smoothing: antialiased; }
+
+    /* ─── Scrollbar ─────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111827; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+
+    /* ─── Sidebar TOC ──────────────────────────────────────────────── */
+    .toc-link { transition: color .2s, border-color .2s; }
+    .toc-link:hover, .toc-link.active { color: #ef4444; border-left-color: #ef4444; }
+
+    /* ─── Section divider ──────────────────────────────────────────── */
+    .section-rule {
+      height: 1px;
+      background: linear-gradient(90deg, #ef4444 0%, rgba(239,68,68,0.2) 60%, transparent 100%);
+      margin-bottom: 2rem;
+    }
+
+    /* ─── Card shine sweep ─────────────────────────────────────────── */
+    .shine { position: relative; overflow: hidden; }
+    .shine::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.04) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform .55s ease;
+      pointer-events: none;
+    }
+    .shine:hover::after { transform: translateX(100%); }
+
+    /* ─── Stat chip ────────────────────────────────────────────────── */
+    .stat-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 9999px;
+      font-size: .7rem; font-weight: 600;
+      letter-spacing: .05em; text-transform: uppercase;
+    }
+
+    /* ─── Card pill tag ────────────────────────────────────────────── */
+    .tag {
+      display: inline-block;
+      padding: 2px 9px; border-radius: 9999px;
+      font-size: .65rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+    }
+
+    /* ─── Combo arrow ─────────────────────────────────────────────── */
+    .combo-arrow {
+      display: inline-flex; align-items: center;
+      color: #6b7280; font-size: .8rem; padding: 0 .35rem;
+    }
+
+    /* ─── Highlight quote bar ──────────────────────────────────────── */
+    .tip-bar {
+      border-left: 3px solid #ef4444;
+      background: rgba(239,68,68,.06);
+      padding: 12px 16px; border-radius: 0 8px 8px 0;
+    }
+
+    /* ─── Progress bar ─────────────────────────────────────────────── */
+    .difficulty-bar { height: 5px; border-radius: 3px; background: #263044; overflow: hidden; }
+    .difficulty-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #ef4444, #fca5a5); }
+
+    /* ─── Mobile nav toggle ────────────────────────────────────────── */
+    #toc-panel { transition: max-height .35s ease, opacity .3s ease; overflow: hidden; }
+
+    /* ─── Fade-in animation ────────────────────────────────────────── */
+    @media (prefers-reduced-motion: no-preference) {
+      .fade-up { animation: fadeUp .6s ease both; }
+      @keyframes fadeUp {
+        from { opacity:0; transform:translateY(20px); }
+        to   { opacity:1; transform:translateY(0); }
+      }
+      .d1{animation-delay:.05s} .d2{animation-delay:.12s} .d3{animation-delay:.19s}
+      .d4{animation-delay:.26s} .d5{animation-delay:.33s}
+    }
+
+    /* ─── Build tab underline ─────────────────────────────────────── */
+    .build-tab { position: relative; }
+    .build-tab::after {
+      content:''; position:absolute; bottom:-2px; left:0; right:0;
+      height:2px; background:#ef4444; border-radius:1px;
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .25s ease;
+    }
+    .build-tab.on::after { transform:scaleX(1); }
+
+    /* ─── Rune dot pattern overlay ────────────────────────────────── */
+    .dot-bg {
+      background-image: radial-gradient(circle, rgba(239,68,68,.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+  </style>
+</head>
+
+<body class="dark font-body">
+
+<!-- ══════════════════════════════════════════════
+     TOP NAV
+══════════════════════════════════════════════ -->
+<nav class="sticky top-0 z-50 bg-ink/90 backdrop-blur-md border-b border-white/5" aria-label="Site navigation">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2.5 group" aria-label="SpireGuide home">
+      <div class="w-7 h-7 rounded-md bg-red flex items-center justify-center shadow-[0_0_14px_rgba(239,68,68,.4)] group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+        </svg>
+      </div>
+      <span class="font-display text-xs font-bold tracking-[.18em] text-parchment hidden sm:block">
+        SPIRE<span class="text-red">GUIDE</span>
+      </span>
+    </a>
+
+    <div class="flex items-center gap-2">
+      <nav class="hidden sm:flex items-center gap-1 text-xs font-medium text-soft">
+        <a href="#" class="hover:text-parchment px-3 py-1.5 rounded hover:bg-white/5 transition-colors">Home</a>
+        <a href="#" class="hover:text-parchment px-3 py-1.5 rounded hover:bg-white/5 transition-colors">Characters</a>
+        <a href="#" class="hover:text-parchment px-3 py-1.5 rounded hover:bg-white/5 transition-colors">Tier List</a>
+        <a href="#" class="hover:text-parchment px-3 py-1.5 rounded hover:bg-white/5 transition-colors">Guides</a>
+      </nav>
+      <span class="hidden sm:block w-px h-4 bg-white/10 mx-1"></span>
+      <div class="stat-chip bg-red/10 text-red border border-red/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-red inline-block animate-pulse"></span>
+        Updated EA Patch 7
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     HERO HEADER
+══════════════════════════════════════════════ -->
+<header class="relative overflow-hidden" aria-labelledby="page-title">
+  <!-- BG image -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=1600&auto=format&fit=crop&q=80"
+      alt="Dark fantasy warrior in armour"
+      class="w-full h-full object-cover object-center"
+      style="filter:brightness(.35) saturate(.8);"
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-ink/60 via-ink/70 to-ink"></div>
+    <div class="absolute inset-0 dot-bg opacity-40"></div>
+  </div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+    <!-- Breadcrumb -->
+    <nav class="text-xs text-muted mb-6 flex items-center gap-1.5" aria-label="Breadcrumb">
+      <a href="#" class="hover:text-soft transition-colors">Home</a>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <a href="#" class="hover:text-soft transition-colors">Characters</a>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      <span class="text-soft">Ironclad Build Guide</span>
+    </nav>
+
+    <div class="flex flex-col sm:flex-row sm:items-end gap-6">
+      <div class="flex-1 fade-up">
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <span class="tag bg-red/15 text-red border border-red/25">Ironclad</span>
+          <span class="tag bg-white/5 text-soft border border-white/10">Early Access</span>
+          <span class="tag bg-gold-bg text-gold border border-gold/20">A20 Viable</span>
+        </div>
+
+        <h1 id="page-title" class="font-display text-3xl sm:text-5xl font-black text-parchment leading-tight mb-4">
+          Ironclad<br/>
+          <span class="text-red">Build Guide</span>
+        </h1>
+
+        <p class="text-soft text-sm sm:text-base leading-relaxed max-w-xl">
+          The Ironclad is Slay the Spire 2's powerhouse warrior — block-stacking, Strength-scaling, and burning through decks with Exhaust synergies. This guide covers the two strongest archetypes, every card and relic worth knowing, and how to counter the bosses that punish you for playing them.
+        </p>
+      </div>
+
+      <!-- Quick stats card -->
+      <div class="fade-up d2 shrink-0 bg-slate/70 border border-white/8 rounded-2xl p-5 min-w-[180px] backdrop-blur-sm">
+        <p class="text-xs text-muted uppercase tracking-widest mb-4 font-semibold">Quick Stats</p>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-soft">Damage</span><span class="text-parchment font-medium">9/10</span></div>
+            <div class="difficulty-bar"><div class="difficulty-fill" style="width:90%"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-soft">Survivability</span><span class="text-parchment font-medium">7/10</span></div>
+            <div class="difficulty-bar"><div class="difficulty-fill" style="width:70%; background:linear-gradient(90deg,#60a5fa,#a78bfa)"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-soft">Consistency</span><span class="text-parchment font-medium">7/10</span></div>
+            <div class="difficulty-bar"><div class="difficulty-fill" style="width:70%; background:linear-gradient(90deg,#34d399,#60a5fa)"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-soft">Difficulty</span><span class="text-parchment font-medium">6/10</span></div>
+            <div class="difficulty-bar"><div class="difficulty-fill" style="width:60%; background:linear-gradient(90deg,#f59e0b,#fca5a5)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     MAIN CONTENT + SIDEBAR
+══════════════════════════════════════════════ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="flex gap-10 items-start">
+
+    <!-- ── Sidebar TOC (desktop) ──────────────────────── -->
+    <aside class="hidden lg:block w-52 shrink-0 sticky top-24" aria-label="Table of contents">
+      <p class="text-xs font-semibold uppercase tracking-widest text-muted mb-4">On This Page</p>
+      <nav class="space-y-0.5">
+        <a href="#overview"       class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Overview</a>
+        <a href="#strength-build" class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Strength Build</a>
+        <a href="#exhaust-build"  class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Exhaust Build</a>
+        <a href="#strategy"       class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Play Strategy</a>
+        <a href="#combos"         class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Key Combos</a>
+        <a href="#boss-tips"      class="toc-link block text-xs text-soft pl-3 py-1.5 border-l border-white/10">Boss Counter Tips</a>
+      </nav>
+
+      <!-- Mini character portrait -->
+      <div class="mt-8 rounded-xl overflow-hidden border border-white/8">
+        <img
+          src="https://images.unsplash.com/photo-1598153346810-860daa814c4b?w=400&auto=format&fit=crop&q=80"
+          alt="Warrior character art"
+          class="w-full h-28 object-cover opacity-80"
+          loading="lazy"
+        />
+        <div class="p-3 bg-slate border-t border-white/5">
+          <p class="text-xs font-semibold text-parchment">Ironclad</p>
+          <p class="text-xs text-muted mt-0.5">HP: 80 — Ascension: 75</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main content ────────────────────────────────── -->
+    <main class="flex-1 min-w-0 space-y-16">
+
+      <!-- ╔══ SECTION 1: OVERVIEW ════════════════════════╗ -->
+      <section id="overview" aria-labelledby="overview-title">
+        <div class="section-rule"></div>
+        <h2 id="overview-title" class="font-display text-xl sm:text-2xl font-bold text-parchment mb-6">
+          Character Overview
+        </h2>
+
+        <div class="grid sm:grid-cols-2 gap-5 mb-8">
+          <div class="shine bg-slate rounded-2xl p-5 border border-white/6 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-red/10 border border-red/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-red" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1.5">Strengths</p>
+                <ul class="text-xs text-soft space-y-1 leading-relaxed">
+                  <li>• Highest single-target damage potential in the game</li>
+                  <li>• Strength scaling enables infinite-like turns late</li>
+                  <li>• Exhaust synergies snowball quickly once online</li>
+                  <li>• Multiple viable archetypes — highly adaptable to draft</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate rounded-2xl p-5 border border-white/6 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-bg border border-blue/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1.5">Weaknesses</p>
+                <ul class="text-xs text-soft space-y-1 leading-relaxed">
+                  <li>• Vulnerable to Strength-reducing bosses (Donu & Deca)</li>
+                  <li>• Exhaust builds can flood hand with dead cards early</li>
+                  <li>• Limited AoE options without specific relic support</li>
+                  <li>• Block generation is inconsistent before Act 2</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-bar">
+          <p class="text-xs font-semibold text-red uppercase tracking-widest mb-1">Core Mechanic</p>
+          <p class="text-sm text-soft leading-relaxed">
+            The Ironclad's unique mechanic is <strong class="text-parchment">Burn Healing</strong> — when a Burn card is exhausted, the Ironclad heals 6 HP. While less central than in StS1, it still underpins survivability and synergizes with Exhaust builds in later acts.
+          </p>
+        </div>
+      </section>
+
+      <!-- ╔══ SECTION 2: STRENGTH BUILD ══════════════════╗ -->
+      <section id="strength-build" aria-labelledby="strength-title">
+        <div class="section-rule"></div>
+
+        <!-- Build header with image -->
+        <div class="relative rounded-2xl overflow-hidden mb-8">
+          <img
+            src="https://images.unsplash.com/photo-1560932684-5e552e2894e9?w=1000&auto=format&fit=crop&q=80"
+            alt="Powerful warrior muscles strength concept"
+            class="w-full h-36 sm:h-48 object-cover"
+            style="filter:brightness(.45) saturate(.7);"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/60 to-transparent"></div>
+          <div class="absolute inset-0 flex items-center px-6 sm:px-8">
+            <div>
+              <span class="tag bg-red/15 text-red border border-red/30 mb-2 inline-block">Build #1</span>
+              <h2 id="strength-title" class="font-display text-2xl sm:text-3xl font-black text-parchment">
+                Strength Build
+              </h2>
+              <p class="text-soft text-xs mt-1">Scale damage once, attack forever</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-soft text-sm leading-relaxed mb-8 max-w-2xl">
+          The Strength Build revolves around stacking the Strength buff as quickly as possible, then hitting with heavy attacks that scale proportionally. Even a modest +8 Strength turns Bash into a 15-damage hit. At +20 and above with Limit Break, the Ironclad can one-shot most bosses in a single turn.
+        </p>
+
+        <!-- Core Cards -->
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-red flex items-center justify-center text-white text-xs">♠</span>
+          Core Cards
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+
+          <!-- Card chip -->
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Inflame</p>
+              <div class="flex gap-1">
+                <span class="tag bg-red/10 text-red border-0">Attack</span>
+                <span class="tag bg-purple-bg text-purple border-0">Power</span>
+              </div>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Gain 2 Strength. Upgraded: Gain 3 Strength. Your highest-priority pick — an early Inflame can carry the entire run.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Limit Break</p>
+              <div class="flex gap-1">
+                <span class="tag bg-blue-bg text-blue border-0">Skill</span>
+                <span class="tag bg-gold-bg text-gold border-0">Exhaust</span>
+              </div>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Double your Strength. Upgraded: no longer Exhausts. Once upgraded, loop it every turn to reach absurd damage ceilings.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Heavy Blade</p>
+              <div class="flex gap-1">
+                <span class="tag bg-red/10 text-red border-0">Attack</span>
+              </div>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Deal 14 damage. Strength applies 3× (5× upgraded). Your primary finisher — at +15 Strength, this hits for 59 / 89 damage.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibent text-parchment group-hover:text-red-pale transition-colors">Demon Form</p>
+              <span class="tag bg-purple-bg text-purple border-0">Power</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Gain 2 Strength at the start of each turn (3 upgraded). Passive Strength that renders long boss fights trivially easy.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Pommel Strike</p>
+              <span class="tag bg-red/10 text-red border-0">Attack</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">9 damage, draw 1 card (2 upgraded). Acts as draw and damage simultaneously — keeps hands flowing mid-combat.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Armaments</p>
+              <span class="tag bg-blue-bg text-blue border-0">Skill</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Gain 5 Block, upgrade 1 card in hand. Upgraded: upgrade all cards in hand. Essential for upgrading Heavy Blade mid-combat.</p>
+          </div>
+        </div>
+
+        <!-- Essential Relics -->
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-gold flex items-center justify-center text-black text-xs">◈</span>
+          Essential Relics
+        </h3>
+        <div class="grid sm:grid-cols-2 gap-3 mb-8">
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">⚔</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Vajra</p>
+                <p class="text-xs text-soft">Start each combat with 1 Strength. Modest alone; combined with Inflame and Demon Form it means your first Heavy Blade is noticeably stronger.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">🪬</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Akabeko</p>
+                <p class="text-xs text-soft">Your first attack each combat deals 8 extra damage. Pairs perfectly with Heavy Blade as your opener — near-essential in Act 1 runs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">🔮</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Mark of Pain</p>
+                <p class="text-xs text-soft">Gain +1 Energy and draw a Wound every turn. Feeds Exhaust synergy if you also run Feel No Pain and Dark Embrace.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">💎</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Philosopher's Stone</p>
+                <p class="text-xs text-soft">All enemies gain 1 Strength. In return you start with +1 Energy permanently. Risky but the energy gain makes Limit Break → Heavy Blade turns viable on 3 energy.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended Potions -->
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-green flex items-center justify-center text-black text-xs">⬡</span>
+          Recommended Potions
+        </h3>
+        <div class="flex flex-wrap gap-3">
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">💪</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Strength Potion</p>
+              <p class="text-xs text-soft">+3 Strength this combat. Doubles Heavy Blade output mid-fight.</p>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">⚡</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Energy Potion</p>
+              <p class="text-xs text-soft">+2 Energy this turn. Fuels Limit Break → Heavy Blade combos on tight turns.</p>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">🔥</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Essence of Steel</p>
+              <p class="text-xs text-soft">Gain 4 Plated Armour. A lifesaver when burst damage is needed but Strength isn't online yet.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══ SECTION 3: EXHAUST BUILD ════════════════════╗ -->
+      <section id="exhaust-build" aria-labelledby="exhaust-title">
+        <div class="section-rule"></div>
+
+        <div class="relative rounded-2xl overflow-hidden mb-8">
+          <img
+            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1000&auto=format&fit=crop&q=80"
+            alt="Burning dark fire abstract"
+            class="w-full h-36 sm:h-48 object-cover"
+            style="filter:brightness(.35) saturate(.85) hue-rotate(-10deg);"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-ink via-ink/60 to-transparent"></div>
+          <div class="absolute inset-0 flex items-center px-6 sm:px-8">
+            <div>
+              <span class="tag bg-red/15 text-red border border-red/30 mb-2 inline-block">Build #2</span>
+              <h2 id="exhaust-title" class="font-display text-2xl sm:text-3xl font-black text-parchment">
+                Exhaust Build
+              </h2>
+              <p class="text-soft text-xs mt-1">Every card played is fuel</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-soft text-sm leading-relaxed mb-8 max-w-2xl">
+          The Exhaust Build turns every card leaving your hand into a resource. Feel No Pain gives Block on each Exhaust. Dark Embrace refills your hand. Evolve turns curses and wounds into opportunities. When this build clicks, you're gaining 10+ Block and drawing 2 cards every time you play a Burn or Offering.
+        </p>
+
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-red flex items-center justify-center text-white text-xs">♠</span>
+          Core Cards
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Feel No Pain</p>
+              <span class="tag bg-purple-bg text-purple border-0">Power</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Gain 3 Block whenever you Exhaust a card (4 upgraded). The backbone — stack 2 copies and each Offering gives you 6–8 Block total.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Dark Embrace</p>
+              <span class="tag bg-purple-bg text-purple border-0">Power</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Draw 1 card whenever you Exhaust a card. The engine. Every Exhaust is a net draw — keeping you in cards while thinning your deck simultaneously.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Offering</p>
+              <div class="flex gap-1">
+                <span class="tag bg-blue-bg text-blue border-0">Skill</span>
+                <span class="tag bg-gold-bg text-gold border-0">Exhaust</span>
+              </div>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Lose 6 HP, gain 2 Energy, draw 3 cards. Triggers both Feel No Pain and Dark Embrace — a single Offering nets you energy, cards, AND block.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Fiend Fire</p>
+              <div class="flex gap-1">
+                <span class="tag bg-red/10 text-red border-0">Attack</span>
+                <span class="tag bg-gold-bg text-gold border-0">Exhaust</span>
+              </div>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Exhaust your hand, deal 7 damage per card Exhausted. Your finisher — with 5 cards in hand this hits for 35 damage while triggering Feel No Pain 5 times.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Evolve</p>
+              <span class="tag bg-purple-bg text-purple border-0">Power</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Draw 1 card when you draw a Status card (2 upgraded). Turns Wounds and Burns from liabilities into extra draw every cycle.</p>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/30 transition-colors group">
+            <div class="flex items-start justify-between mb-2">
+              <p class="text-sm font-semibold text-parchment group-hover:text-red-pale transition-colors">Second Wind</p>
+              <span class="tag bg-blue-bg text-blue border-0">Skill</span>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Exhaust all non-Attack cards in hand, gain 5 Block per card Exhausted. Emergency survival button that also triggers Feel No Pain per card.</p>
+          </div>
+        </div>
+
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-gold flex items-center justify-center text-black text-xs">◈</span>
+          Essential Relics
+        </h3>
+        <div class="grid sm:grid-cols-2 gap-3 mb-8">
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">🔱</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Dead Branch</p>
+                <p class="text-xs text-soft">Whenever you Exhaust a card, add a random card to your hand. An Exhaust build's best relic — each Fiend Fire generates entire turns worth of new cards.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">⚗️</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Gamblers Chip</p>
+                <p class="text-xs text-soft">At the start of combat, if you have 3 or fewer cards in hand, draw until you have 5. Prevents slow Exhaust starts where you're waiting for key powers.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">🎭</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Runic Cube</p>
+                <p class="text-xs text-soft">Whenever you lose HP, draw 1 card. Offering costs you 6 HP — which now also draws a card. Significantly amplifies Offering's already-insane value.</p>
+              </div>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-gold/15 rounded-xl p-4 hover:border-gold/35 transition-colors">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-gold-bg border border-gold/20 flex items-center justify-center text-base">🗡️</div>
+              <div>
+                <p class="text-sm font-semibold text-parchment mb-1">Calipers</p>
+                <p class="text-xs text-soft">Don't lose more than 15 Block at end of turn. Preserves the huge Block stacks you generate through Feel No Pain, making tanking easier across multiple rounds.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="font-display text-base font-bold text-parchment mb-4 flex items-center gap-2">
+          <span class="w-5 h-5 rounded-md bg-green flex items-center justify-center text-black text-xs">⬡</span>
+          Recommended Potions
+        </h3>
+        <div class="flex flex-wrap gap-3">
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">💊</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Block Potion</p>
+              <p class="text-xs text-soft">Instant 12 Block. Buy time while waiting for Feel No Pain to appear.</p>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">🌀</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Distilled Chaos</p>
+              <p class="text-xs text-soft">Play top 3 cards of draw pile. Can chain into Offerings and Exhaust triggers unexpectedly.</p>
+            </div>
+          </div>
+          <div class="shine bg-slate border border-green/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-green/40 transition-colors">
+            <span class="text-xl">❤️</span>
+            <div>
+              <p class="text-sm font-semibold text-parchment">Fairy in a Bottle</p>
+              <p class="text-xs text-soft">Revive at 30% HP if you die. Insurance for the risky Offering + low HP decisions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══ SECTION 4: STRATEGY ═════════════════════════╗ -->
+      <section id="strategy" aria-labelledby="strategy-title">
+        <div class="section-rule"></div>
+        <h2 id="strategy-title" class="font-display text-xl sm:text-2xl font-bold text-parchment mb-6">
+          Play Strategy
+        </h2>
+
+        <div class="grid sm:grid-cols-2 gap-5 mb-8">
+          <!-- Act by act -->
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-6 h-6 rounded-full bg-red text-white text-xs flex items-center justify-center font-bold">1</span>
+              <p class="text-sm font-semibold text-parchment">Act 1 — Build the Engine</p>
+            </div>
+            <ul class="space-y-2 text-xs text-soft leading-relaxed">
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Prioritise Inflame above almost everything. A first-floor Inflame changes the entire run.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Take card removal aggressively — a 10-card deck with Inflame beats a 20-card deck without it.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Skip most Wounds in shops unless they're less than 80 gold.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Beat the Gremlin Nob by front-loading Block before attacking.</li>
+            </ul>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-6 h-6 rounded-full bg-red text-white text-xs flex items-center justify-center font-bold">2</span>
+              <p class="text-sm font-semibold text-parchment">Act 2 — Pivot & Commit</p>
+            </div>
+            <ul class="space-y-2 text-xs text-soft leading-relaxed">
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>By now you should know if you're Strength or Exhaust. Don't try to do both.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Heavy Blade and Fiend Fire should both be upgraded if they're in your deck.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Limit Break (unupgraded) is still worth playing as a one-time doubler in boss fights.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Don't neglect Block options — Act 2 elites punish passive players.</li>
+            </ul>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-6 h-6 rounded-full bg-red text-white text-xs flex items-center justify-center font-bold">3</span>
+              <p class="text-sm font-semibold text-parchment">Act 3 — Execute the Win</p>
+            </div>
+            <ul class="space-y-2 text-xs text-soft leading-relaxed">
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Your deck should be 15 cards or fewer. If it's larger, visit every removal event.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Limit Break upgraded turns any boss fight into a math problem the boss loses.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Save Strength and Energy potions for Act 3 boss — the Heart needs a 1-turn kill plan.</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Demon Form + upgraded Limit Break = win condition. Anything else is supplemental.</li>
+            </ul>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-6 h-6 rounded-full bg-red/80 text-white text-xs flex items-center justify-center font-bold">♦</span>
+              <p class="text-sm font-semibold text-parchment">Draft Priorities</p>
+            </div>
+            <ul class="space-y-2 text-xs text-soft leading-relaxed">
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span><strong class="text-parchment">S-tier picks:</strong> Inflame, Limit Break, Dark Embrace, Feel No Pain</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span><strong class="text-parchment">A-tier picks:</strong> Demon Form, Fiend Fire, Heavy Blade, Offering</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span><strong class="text-parchment">B-tier:</strong> Pummel, Pommel Strike, Second Wind, Evolve</li>
+              <li class="flex gap-2"><span class="text-red mt-0.5">▸</span>Skip low-value Block cards unless you have nothing — Impervious is the exception.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tip-bar">
+          <p class="text-xs font-semibold text-red uppercase tracking-widest mb-1">General Rule</p>
+          <p class="text-sm text-soft leading-relaxed">
+            <strong class="text-parchment">Upgrade Heavy Blade or Limit Break before anything else.</strong> A +1 on Bash is nice. Upgrading Heavy Blade from 3× Strength to 5× Strength at +15 Strength is an extra 30 damage per swing.
+          </p>
+        </div>
+      </section>
+
+      <!-- ╔══ SECTION 5: KEY COMBOS ═══════════════════════╗ -->
+      <section id="combos" aria-labelledby="combos-title">
+        <div class="section-rule"></div>
+        <h2 id="combos-title" class="font-display text-xl sm:text-2xl font-bold text-parchment mb-6">
+          Key Combos
+        </h2>
+        <p class="text-soft text-sm leading-relaxed mb-8 max-w-2xl">
+          The Ironclad's best turns are chains, not single cards. Learn these sequences and you'll know exactly what to hold for and when to snap off your finisher.
+        </p>
+
+        <div class="space-y-4">
+
+          <!-- Combo card -->
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0 w-9 h-9 rounded-xl bg-red/10 border border-red/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-red" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-parchment mb-2">The Classic Burst</p>
+                <div class="flex flex-wrap items-center gap-1 mb-3">
+                  <span class="tag bg-purple-bg text-purple border border-purple/20">Demon Form</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-blue-bg text-blue border border-blue/20">Limit Break ×2</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-red/10 text-red border border-red/20">Heavy Blade ×3</span>
+                </div>
+                <p class="text-xs text-soft leading-relaxed">With Demon Form active (+2 Strength/turn) and upgraded Limit Break: on turn 3 you might have +16 Strength, double it to +32, Heavy Blade hits for 14 + (32 × 5) = 174 damage. Most bosses have under 300 HP.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0 w-9 h-9 rounded-xl bg-gold-bg border border-gold/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-parchment mb-2">The Exhaust Engine Turn</p>
+                <div class="flex flex-wrap items-center gap-1 mb-3">
+                  <span class="tag bg-purple-bg text-purple border border-purple/20">Feel No Pain ×2</span>
+                  <span class="combo-arrow">+</span>
+                  <span class="tag bg-purple-bg text-purple border border-purple/20">Dark Embrace</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-gold-bg text-gold border border-gold/20">Offering</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-red/10 text-red border border-red/20">Fiend Fire</span>
+                </div>
+                <p class="text-xs text-soft leading-relaxed">Offering: −6 HP, +2 Energy, draw 3. Each Feel No Pain gives 3 Block (6 total). Dark Embrace draws another card. Then Fiend Fire exhausts the whole hand — each card triggers Feel No Pain again for massive block + 7 damage per card.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0 w-9 h-9 rounded-xl bg-blue-bg border border-blue/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-parchment mb-2">Dead Branch Chaos</p>
+                <div class="flex flex-wrap items-center gap-1 mb-3">
+                  <span class="tag bg-gold-bg text-gold border border-gold/20">Dead Branch relic</span>
+                  <span class="combo-arrow">+</span>
+                  <span class="tag bg-purple-bg text-purple border border-purple/20">Feel No Pain</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-red/10 text-red border border-red/20">Fiend Fire</span>
+                </div>
+                <p class="text-xs text-soft leading-relaxed">Each Exhaust from Fiend Fire generates a random card via Dead Branch. Those cards can themselves be exhausted in the same chain if they are naturally Exhaust cards. With 6+ cards in hand, you can generate an entirely new hand mid-Fiend Fire.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0 w-9 h-9 rounded-xl bg-green-bg border border-green/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-green" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-parchment mb-2">The Safe Opener</p>
+                <div class="flex flex-wrap items-center gap-1 mb-3">
+                  <span class="tag bg-blue-bg text-blue border border-blue/20">Shrug It Off</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-blue-bg text-blue border border-blue/20">Defend</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-red/10 text-red border border-red/20">Inflame</span>
+                  <span class="combo-arrow">→</span>
+                  <span class="tag bg-red/10 text-red border border-red/20">Bash</span>
+                </div>
+                <p class="text-xs text-soft leading-relaxed">Against high-damage openers (Jaw Worm, Lagavulin), spend turn 1 front-loading block first. Then play Inflame before Bash to benefit from the +2 Strength on the attack itself — never waste a buff by playing attacks first.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ╔══ SECTION 6: BOSS TIPS ════════════════════════╗ -->
+      <section id="boss-tips" aria-labelledby="boss-title">
+        <div class="section-rule"></div>
+        <h2 id="boss-title" class="font-display text-xl sm:text-2xl font-bold text-parchment mb-2">
+          Boss &amp; Elite Counter Tips
+        </h2>
+        <p class="text-soft text-sm leading-relaxed mb-8 max-w-2xl">
+          The Ironclad's damage ceiling is the highest in the game — but several bosses specifically counter Strength scaling. Know the matchups before you get there.
+        </p>
+
+        <div class="relative rounded-2xl overflow-hidden mb-8">
+          <img
+            src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1000&auto=format&fit=crop&q=80"
+            alt="Dark digital matrix threat environment"
+            class="w-full h-28 sm:h-36 object-cover"
+            style="filter:brightness(.3) saturate(.6) hue-rotate(20deg);"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-ink to-transparent"></div>
+          <div class="absolute inset-0 flex items-center px-6">
+            <p class="font-display text-lg sm:text-xl font-bold text-parchment">Act Bosses</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 mb-10">
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div class="flex items-center gap-3 sm:w-44 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-red/10 border border-red/20 flex items-center justify-center text-sm">💀</div>
+                <div>
+                  <p class="text-sm font-semibold text-parchment">The Guardian</p>
+                  <span class="tag bg-red-pale/10 text-red-pale border-0 mt-0.5">Act 1 Boss</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-soft leading-relaxed mb-2">Activates a second phase at 50% HP with higher damage. The key is front-loading Block before its Defensive Mode, then unloading Heavy Blades during the vulnerability window.</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span class="stat-chip bg-green-bg text-green border border-green/15">✓ Kill before phase 2 if possible</span>
+                  <span class="stat-chip bg-gold-bg text-gold border border-gold/15">⚡ Save Strength Potion for vulnerability</span>
+                  <span class="stat-chip bg-red/8 text-red border border-red/15">✗ Don't attack during Defensive Mode</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div class="flex items-center gap-3 sm:w-44 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-red/10 border border-red/20 flex items-center justify-center text-sm">💀</div>
+                <div>
+                  <p class="text-sm font-semibold text-parchment">Donu &amp; Deca</p>
+                  <span class="tag bg-red-pale/10 text-red-pale border-0 mt-0.5">Act 2 Boss</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-soft leading-relaxed mb-2">Deca reduces your Strength by 2 per turn. This is the Strength Build's hardest matchup. Kill Deca first, then mop up Donu. The Exhaust Build handles this better — its damage doesn't rely on Strength.</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span class="stat-chip bg-green-bg text-green border border-green/15">✓ Kill Deca first, always</span>
+                  <span class="stat-chip bg-gold-bg text-gold border border-gold/15">⚡ Exhaust build significantly easier here</span>
+                  <span class="stat-chip bg-red/8 text-red border border-red/15">✗ Don't spread damage between both</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="shine bg-slate border border-white/6 rounded-2xl p-5 hover:border-red/25 transition-colors">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+              <div class="flex items-center gap-3 sm:w-44 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-red/10 border border-red/20 flex items-center justify-center text-sm">💀</div>
+                <div>
+                  <p class="text-sm font-semibold text-parchment">Awakened One</p>
+                  <span class="tag bg-red-pale/10 text-red-pale border-0 mt-0.5">Act 3 Boss</span>
+                </div>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-soft leading-relaxed mb-2">Heals to full and gains 2 Strength per power you play after reviving. Play all your powers before killing it in phase 1, or hold them for phase 2 if you can't. Alternatively, kill it before it reaches half HP — save energy and burst it.</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <span class="stat-chip bg-green-bg text-green border border-green/15">✓ Play all powers before first kill</span>
+                  <span class="stat-chip bg-gold-bg text-gold border border-gold/15">⚡ Save burst for phase 2 if uncertain</span>
+                  <span class="stat-chip bg-red/8 text-red border border-red/15">✗ Never play Demon Form after phase 2 starts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Elites -->
+        <div class="relative rounded-2xl overflow-hidden mb-6">
+          <div class="absolute inset-0 bg-gradient-to-r from-ink to-transparent z-10"></div>
+          <img
+            src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1000&auto=format&fit=crop&q=80"
+            alt="Retro screen darkness atmosphere"
+            class="w-full h-24 object-cover"
+            style="filter:brightness(.3) saturate(.5);"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 flex items-center px-6 z-20">
+            <p class="font-display text-base font-bold text-parchment">Key Elite Encounters</p>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-md bg-red/10 flex items-center justify-center text-xs">⚡</div>
+              <p class="text-sm font-semibold text-parchment">Gremlin Nob</p>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Gains 3 Strength whenever you play a Skill. Do not play a single Skill — only Attacks and Powers. An Inflame before Bashes means he dies to 2 good attacks with no counter-scaling.</p>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-md bg-red/10 flex items-center justify-center text-xs">😴</div>
+              <p class="text-sm font-semibold text-parchment">Lagavulin</p>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Debuffs your Strength and Dexterity by −2 each after 3 turns asleep. Wake it by attacking on turn 1. Never let the debuff tick — deal 8+ damage early to trigger the combat immediately.</p>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-md bg-red/10 flex items-center justify-center text-xs">👻</div>
+              <p class="text-sm font-semibold text-parchment">Sentries</p>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Three enemies that Daze and Wound your deck. Whirlwind or Cleave is ideal here. Without AoE, prioritise killing one immediately and blocking the others — don't let Dazed cards multiply for more than one cycle.</p>
+          </div>
+          <div class="shine bg-slate border border-white/6 rounded-xl p-4 hover:border-red/25 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-md bg-red/10 flex items-center justify-center text-xs">🔵</div>
+              <p class="text-sm font-semibold text-parchment">Shield &amp; Spear</p>
+            </div>
+            <p class="text-xs text-soft leading-relaxed">Shield removes your Buffs when attacked, Spear deals high damage. Kill Spear first — then Shield can't punish you by removing Strength while you chip it down safely.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Closing note -->
+      <div class="rounded-2xl bg-gradient-to-br from-red/10 to-red/5 border border-red/20 p-6 text-center">
+        <p class="font-display text-base font-bold text-parchment mb-2">You're ready to climb.</p>
+        <p class="text-xs text-soft max-w-md mx-auto leading-relaxed mb-4">The Ironclad rewards commitment to a single archetype. Pick your build on floor 2 and draft everything toward it. A focused 15-card deck beats a versatile 30-card deck every time.</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <a href="#strength-build" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-red text-white text-xs font-semibold rounded-xl hover:bg-red-dim transition-colors shadow-[0_0_18px_rgba(239,68,68,.3)]">
+            ↑ Back to Strength Build
+          </a>
+          <a href="#exhaust-build" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white/5 border border-white/10 text-soft text-xs font-semibold rounded-xl hover:bg-white/10 transition-colors">
+            ↑ Back to Exhaust Build
+          </a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer class="mt-20 border-t border-white/5 bg-ink py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5">
+      <div class="w-6 h-6 rounded-md bg-red flex items-center justify-center">
+        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C8.5 6 6 9 6 12.5a6 6 0 0012 0C18 9 15.5 6 12 2zm0 16.5a4 4 0 01-4-4C8 11.8 9.7 9.3 12 6.4c2.3 2.9 4 5.4 4 8.1a4 4 0 01-4 4z"/>
+        </svg>
+      </div>
+      <span class="font-display text-xs font-bold tracking-widest text-parchment">SPIRE<span class="text-red">GUIDE</span></span>
+    </div>
+    <p class="text-xs text-muted text-center">
+      &copy; 2025 SpireGuide — Fan site, not affiliated with Mega Crit Games.
+      <span class="mx-2 opacity-40">|</span>
+      Made for the Slay the Spire community.
+    </p>
+    <div class="flex items-center gap-4 text-xs text-muted">
+      <a href="#" class="hover:text-soft transition-colors">All Guides</a>
+      <a href="#" class="hover:text-soft transition-colors">Tier Lists</a>
+      <a href="#" class="hover:text-soft transition-colors">Discord</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Active TOC link script -->
+<script>
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const sections = [...tocLinks].map(l => document.querySelector(l.getAttribute('href')));
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => s && obs.observe(s));
+</script>
+
+</body>
+</html>
