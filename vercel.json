@@ -1,0 +1,8 @@
+{
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/", "dest": "/slay-the-spire-2-guide.html" },
+    { "src": "/ironclad", "dest": "/ironclad-build-guide.html" },
+    { "src": "/tier-list", "dest": "/sts2-tier-list.html" }
+  ]
+}
